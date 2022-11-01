@@ -68,6 +68,7 @@ Vagrant.configure("2") do |config|
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", path: "./scripts/shell_init.sh"
+  config.vm.provision "shell", path: "./scripts/install-script.sh"
   config.vm.provision "shell", privileged: false, path: "./scripts/step-docker.sh"
   config.vm.provision "shell", privileged: false, path: "./scripts/step-airflow.sh"
   # config.vm.provision "shell", inline: <<-SHELL
