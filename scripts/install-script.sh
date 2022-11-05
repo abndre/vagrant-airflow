@@ -66,31 +66,59 @@ chown -R airflow:airflow $AIRFLOW_HOME
 chown airflow /var/log/airflow
 
 # create a persistent varable for AIRFLOW across all users env
-echo export AIRFLOW_HOME=/opt/airflow > /etc/profile.d/airflow.sh
-echo export AIRFLOW__CORE__LOAD_EXAMPLES='false' >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__CORE__DEFAULT_UI_TIMEZONE='America/Sao_Paulo' >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__CORE__DEFAULT_TIMEZONE='America/Sao_Paulo' >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE='America/Sao_Paulo' >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__WEBSERVER__INSTANCE_NAME='SHELL_AIRFLOW' >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@localhost:5432/airflow >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__CORE__EXECUTOR=CeleryExecutor >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__CELERY__BROKER_URL=redis://:@localhost:6379/0 >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@localhost:5432/airflow >> /etc/profile.d/airflow.sh
-echo export AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION='true' >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW_HOME=/opt/airflow > /etc/profile.d/airflow.sh
+#echo export AIRFLOW__CORE__LOAD_EXAMPLES='false' >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__CORE__DEFAULT_UI_TIMEZONE='America/Sao_Paulo' >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__CORE__DEFAULT_TIMEZONE='America/Sao_Paulo' >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE='America/Sao_Paulo' >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__WEBSERVER__INSTANCE_NAME='SHELL_AIRFLOW' >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@localhost:5432/airflow >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__CORE__EXECUTOR=CeleryExecutor >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__CELERY__BROKER_URL=redis://:@localhost:6379/0 >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@localhost:5432/airflow >> /etc/profile.d/airflow.sh
+#echo export AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION='true' >> /etc/profile.d/airflow.sh
 
-sudo tee -a /tmp/airflow_environment<<EOL
-AIRFLOW_HOME=/opt/airflow
-AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION='true'
-AIRFLOW__CORE__LOAD_EXAMPLES='false'
-AIRFLOW__CORE__DEFAULT_UI_TIMEZONE='America/Sao_Paulo'
-AIRFLOW__CORE__DEFAULT_TIMEZONE='America/Sao_Paulo'
-AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE='America/Sao_Paulo'
-AIRFLOW__WEBSERVER__INSTANCE_NAME='SHELL_AIRFLOW'
-AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@localhost:5432/airflow
-AIRFLOW__CELERY__BROKER_URL=redis://:@localhost:6379/0
-AIRFLOW__CORE__EXECUTOR=CeleryExecutor
-AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@localhost:5432/airflow
-EOL
+#sudo tee -a /tmp/airflow_environment<<EOL
+#AIRFLOW_HOME=/opt/airflow
+#AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION='true'
+#AIRFLOW__CORE__LOAD_EXAMPLES='false'
+#AIRFLOW__CORE__DEFAULT_UI_TIMEZONE='America/Sao_Paulo'
+#AIRFLOW__CORE__DEFAULT_TIMEZONE='America/Sao_Paulo'
+#AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE='America/Sao_Paulo'
+#AIRFLOW__WEBSERVER__INSTANCE_NAME='SHELL_AIRFLOW'
+#AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@localhost:5432/airflow
+#AIRFLOW__CELERY__BROKER_URL=redis://:@localhost:6379/0
+#AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+#AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@localhost:5432/airflow
+#EOL
+
+declare -a arr=(
+"AIRFLOW_HOME=/opt/airflow" 
+"AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION='true'" 
+"AIRFLOW__CORE__LOAD_EXAMPLES='false'" 
+"AIRFLOW__CORE__DEFAULT_UI_TIMEZONE='America/Sao_Paulo'" 
+"AIRFLOW__CORE__DEFAULT_TIMEZONE='America/Sao_Paulo'" 
+"AIRFLOW__WEBSERVER__DEFAULT_UI_TIMEZONE='America/Sao_Paulo'" 
+"AIRFLOW__WEBSERVER__INSTANCE_NAME='SHELL_AIRFLOW'" 
+"AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@localhost:5432/airflow" 
+"AIRFLOW__CELERY__BROKER_URL=redis://:@localhost:6379/0" 
+"AIRFLOW__CORE__EXECUTOR=CeleryExecutor" 
+"AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@localhost:5432/airflow"
+)
+## clean file
+truncate -s 0 /etc/profile.d/airflow.sh
+## now loop through the above array
+for i in "${arr[@]}"
+do
+   echo export "$i" >> /etc/profile.d/airflow.sh
+done
+
+truncate -s 0 /tmp/airflow_environment
+for i in "${arr[@]}"
+do
+   echo "$i" >> /tmp/airflow_environment
+done
+
 
 cat /tmp/airflow_environment | sudo tee -a /etc/default/airflow
 
@@ -201,6 +229,7 @@ sudo systemctl start webserver.service
 #journalctl -u webserver.service -b
 sudo systemctl enable scheduler.service
 sudo systemctl start scheduler.service
+#sudo systemctl restart scheduler.service
 #sudo systemctl status scheduler.service
 #journalctl -u scheduler.service -b
 sudo systemctl enable worker.service
