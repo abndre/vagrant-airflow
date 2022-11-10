@@ -27,3 +27,7 @@ vagrant provision
 ## Vagrant com serviços Docker
 é possivel tambem instalar o airflow na VM, e subir os serviços do
 postgresql e redis com o docker, este modo eu gosto particularmente pela facilidade.
+
+## Dags
+
+Na pasta [dags](./dags/) temos as dags a serem utilizadas no airflow.
