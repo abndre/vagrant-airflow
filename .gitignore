@@ -1,2 +1,4 @@
 .vagrant/
 *.pyc
+dags/__pycache__/*.pyc
+dags/__pycache__/*
